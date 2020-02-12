@@ -37,8 +37,6 @@ class Module extends \yii\base\Module
         $itemId = preg_replace('/[^0-9]+/', '', $item);
         $modelName = preg_replace('/[0-9]+/', '', $item);
 
-        
-
         //Lets get image
         if(empty($this->className)) {
             $imageQuery = Image::find();
