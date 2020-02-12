@@ -1,21 +1,10 @@
 yii2-images
 ===========
-Guys, we definetly need to do something with this repo. I see several ways:
-<ul>
-<li>to write tests</li>
-<li>to find active contributers</li>
-<li>to find some alternative repo</li>
-</ul>
-What do you prefer? please let me know.
+
+Модуль поддерживает библиотеки Imagick и GD, вы можете настроить его в настройках модуля.
 
 
-
-Yii2-images is yii2 module that allows to attach images to any of your models, next you can get images in any sizes, also you can set main image of images set.
-
-Module supports Imagick and GD libraries, you can set up it in module settings.
-
-
-Usage instance:
+Пример использования:
 -------------
 
 ```php
@@ -59,9 +48,9 @@ if($image){
 
 ```
 
-Details
+Детали
 -------------
-1. Get images
+1. Получить изображения
     ```php
     $model->getImage(); //returns main image for model (first added image or setted as main)
     
@@ -71,14 +60,14 @@ Details
     //If you want placeholder set up it in module configuration (see documentation)
     
     ```
-2. Remove image/images
+2. Удалить изображение / изображения
     ```php
     $model->removeImage($image); //you must to pass image (object)
     
     $model->removeImages(); //will remove all images of this model
     ```
 
-3. Set main image
+3. Установить основное изображение
     ```php
     $model->attachImage($absolutePathToImage, true); //will attach image and make it main
     
@@ -89,7 +78,7 @@ Details
     }
     ```
 
-4. Get image sizes
+4. Получить размеры изображения
     ```php
     $image = $model->getImage();
     $sizes = $image->getSizes(); // Array. Original image sizes
@@ -97,23 +86,26 @@ Details
     echo '&lt;img width="'.$sizes['width'].'" height="'.$sizes['height'].'" src="'.$image->getUrl('x500').'" />';
     ```
 
-5. Get original image
+5. Получить оригинальное изображение
     ```php
     $img = $model->getImage();
     echo $img->getPathToOrigin();
     ```
 
 
-Installation
+Установка
 -------------
-1. Add Yii2-images to the require section of your composer.json file:
-    <pre>
-       {
-            "require": {
-                "alex290/yii2-images": "dev-master"
-            }
-       }
-    </pre>
+1. Запустить
+
+	php composer.phar require --prefer-dist alex290/yii2-images "*"
+
+или добавить
+
+	"alex290/yii2-images": "*"
+
+
+в секцию require вашего `composer.json` файла.
+
 2. run 
     <pre>
       php composer.phar update
@@ -124,7 +116,7 @@ Installation
     php yii migrate/up --migrationPath=@vendor/alex290/yii2-images/migrations
     </pre>
 
-4. setup module
+4. Настройка модуля
     ```php
     'modules' => [
             'yii2images' => [
