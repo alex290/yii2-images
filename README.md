@@ -97,14 +97,13 @@ if($image){
 -------------
 1. Запустить
 
-	php composer.phar require --prefer-dist alex290/yii2-images "*"
+        php composer.phar require --prefer-dist alex290/yii2-images "*"
 
-или добавить
+    или добавить
 
-	"alex290/yii2-images": "*"
+	    "alex290/yii2-images": "*"
 
-
-в секцию require вашего `composer.json` файла.
+    в секцию require вашего `composer.json` файла.
 
 2. run 
     <pre>
