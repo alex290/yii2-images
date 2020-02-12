@@ -1,0 +1,37 @@
+{
+    "name": "alex290/yii2-images",
+    "description": "yii2 images module for storing images",
+    "keywords": ["yii2", "images", "store", "images store", "yii2-images", "Costa alex290"],
+    "type": "yii2-extension",
+    "license": "BSD-3-Clause",
+
+    "authors": [
+        {
+            "name": "Costa alex290",
+            "email": "zetogo@gmail.com"
+        },
+        {
+            "name": "Rob Rhyne",
+            "email": "rob.rhyne@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "yiisoft/yii2": "*",
+        "abeautifulsite/simpleimage": "2.7"
+    },
+    "require-dev": {
+        "yiisoft/yii2-codeception": "*",
+        "codeception/specify": "*",
+        "codeception/verify": "*",
+        "mikey179/vfsStream": "1.3.*@dev"
+    },
+    "suggest": {
+        "ext-imagick": ""
+    },
+    "autoload": {
+        "psr-4": {
+            "alex290\\yii2images\\": ""
+        }
+    }
+}
