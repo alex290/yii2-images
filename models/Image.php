@@ -14,6 +14,7 @@
 
 namespace alex290\yii2images\models;
 
+use alex290\yii2images\behaviors\SimpleImage;
 use Yii;
 use yii\base\Exception;
 use yii\helpers\Url;
@@ -183,7 +184,7 @@ class Image extends \yii\db\ActiveRecord
                 $image->writeImage($pathToSave);
             }else{
 
-                $image = new \abeautifulsite\SimpleImage($imagePath);
+                $image = new SimpleImage($imagePath);
 
                 if($size){
                     if($size['height'] && $size['width']){
