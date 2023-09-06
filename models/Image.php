@@ -32,48 +32,54 @@ class Image extends \yii\db\ActiveRecord
 
 
 
-    public function clearCache(){
+    public function clearCache()
+    {
         $subDir = $this->getSubDur();
 
-        $dirToRemove = $this->getModule()->getCachePath().DIRECTORY_SEPARATOR.$subDir;
+        $dirToRemove = $this->getModule()->getCachePath() . DIRECTORY_SEPARATOR . $subDir;
 
-        if(preg_match('/'.preg_quote($this->modelName, '/').'/', $dirToRemove)){
+        if (preg_match('/' . preg_quote($this->modelName, '/') . '/', $dirToRemove)) {
             BaseFileHelper::removeDirectory($dirToRemove);
-
         }
 
         return true;
     }
 
-    public function getExtension(){
+    public function getExtension()
+    {
         $ext = pathinfo($this->getPathToOrigin(), PATHINFO_EXTENSION);
         return $ext;
     }
 
-    public function getUrl($size = false){
-        $urlSize = ($size) ? '_'.$size : '';
+    public function getUrl($size = false)
+    {
+        $urlSize = ($size) ? '_' . $size : '';
         $url = Url::toRoute([
-            '/'.$this->getPrimaryKey().'/images/image-by-item-and-alias',
-            'item' => $this->modelName.$this->itemId,
-            'dirtyAlias' =>  $this->urlAlias.$urlSize.'.'.$this->getExtension()
+            '/' . $this->getPrimaryKey() . '/images/image-by-item-and-alias',
+            'item' => $this->modelName . $this->itemId,
+            'dirtyAlias' =>  $this->urlAlias . $urlSize . '.' . $this->getExtension()
         ]);
 
         return $url;
     }
 
-    public function getPath($size = false){
-        $urlSize = ($size) ? '_'.$size : '';
+    public function getPath($size = false)
+    {
+        $urlSize = ($size) ? '_' . $size : '';
         $base = $this->getModule()->getCachePath();
         $sub = $this->getSubDur();
 
         $origin = $this->getPathToOrigin();
 
-        $filePath = $base.DIRECTORY_SEPARATOR.
-            $sub.DIRECTORY_SEPARATOR.$this->urlAlias.$urlSize.'.'.pathinfo($origin, PATHINFO_EXTENSION);;
-        if(!file_exists($filePath)){
+        $filePath = $base . DIRECTORY_SEPARATOR .
+            $sub . DIRECTORY_SEPARATOR . $this->urlAlias . $urlSize . '.' . pathinfo($origin, PATHINFO_EXTENSION);;
+        if (!file_exists($filePath)) {
+            if (!file_exists($origin)) {
+                return null;
+            }
             $this->createVersion($origin, $size);
 
-            if(!file_exists($filePath)){
+            if (!file_exists($filePath)) {
                 throw new \Exception('Problem with image creating.');
             }
         }
@@ -81,15 +87,17 @@ class Image extends \yii\db\ActiveRecord
         return $filePath;
     }
 
-    public function getContent($size = false){
+    public function getContent($size = false)
+    {
         return file_get_contents($this->getPath($size));
     }
 
-    public function getPathToOrigin(){
+    public function getPathToOrigin()
+    {
 
         $base = $this->getModule()->getStorePath();
 
-        $filePath = $base.DIRECTORY_SEPARATOR.$this->filePath;
+        $filePath = $base . DIRECTORY_SEPARATOR . $this->filePath;
 
         return $filePath;
     }
@@ -98,11 +106,11 @@ class Image extends \yii\db\ActiveRecord
     public function getSizes()
     {
         $sizes = false;
-        if($this->getModule()->graphicsLibrary == 'Imagick'){
+        if ($this->getModule()->graphicsLibrary == 'Imagick') {
             $image = new \Imagick($this->getPathToOrigin());
             $sizes = $image->getImageGeometry();
-        }else{
-            $image = new \abeautifulsite\SimpleImage($this->getPathToOrigin());
+        } else {
+            $image = new SimpleImage($this->getPathToOrigin());
             $sizes['width'] = $image->get_width();
             $sizes['height'] = $image->get_height();
         }
@@ -110,10 +118,11 @@ class Image extends \yii\db\ActiveRecord
         return $sizes;
     }
 
-    public function getSizesWhen($sizeString){
+    public function getSizesWhen($sizeString)
+    {
 
         $size = $this->getModule()->parseSize($sizeString);
-        if(!$size){
+        if (!$size) {
             throw new \Exception('Bad size..');
         }
 
@@ -124,12 +133,12 @@ class Image extends \yii\db\ActiveRecord
         $imageWidth = $sizes['width'];
         $imageHeight = $sizes['height'];
         $newSizes = [];
-        if(!$size['width']){
-            $newWidth = $imageWidth*($size['height']/$imageHeight);
+        if (!$size['width']) {
+            $newWidth = $imageWidth * ($size['height'] / $imageHeight);
             $newSizes['width'] = intval($newWidth);
             $newSizes['height'] = $size['height'];
-        }elseif(!$size['height']){
-            $newHeight = intval($imageHeight*($size['width']/$imageWidth));
+        } elseif (!$size['height']) {
+            $newHeight = intval($imageHeight * ($size['width'] / $imageWidth));
             $newSizes['width'] = $size['width'];
             $newSizes['height'] = $newHeight;
         }
@@ -139,7 +148,7 @@ class Image extends \yii\db\ActiveRecord
 
     public function createVersion($imagePath, $sizeString = false)
     {
-        if(strlen($this->urlAlias)<1){
+        if (strlen($this->urlAlias) < 1) {
             throw new \Exception('Image without urlAlias!');
         }
 
@@ -147,124 +156,127 @@ class Image extends \yii\db\ActiveRecord
         $subDirPath = $this->getSubDur();
         $fileExtension =  pathinfo($this->filePath, PATHINFO_EXTENSION);
 
-        if($sizeString){
-            $sizePart = '_'.$sizeString;
-        }else{
+        if ($sizeString) {
+            $sizePart = '_' . $sizeString;
+        } else {
             $sizePart = '';
         }
 
-        $pathToSave = $cachePath.'/'.$subDirPath.'/'.$this->urlAlias.$sizePart.'.'.$fileExtension;
+        $pathToSave = $cachePath . '/' . $subDirPath . '/' . $this->urlAlias . $sizePart . '.' . $fileExtension;
 
         BaseFileHelper::createDirectory(dirname($pathToSave), 0777, true);
 
 
-        if($sizeString) {
+        if ($sizeString) {
             $size = $this->getModule()->parseSize($sizeString);
-        }else{
+        } else {
             $size = false;
         }
 
-            if($this->getModule()->graphicsLibrary == 'Imagick'){
-                $image = new \Imagick($imagePath);
+        if ($this->getModule()->graphicsLibrary == 'Imagick') {
+            $image = new \Imagick($imagePath);
 
-                $image->setImageCompressionQuality( $this->getModule()->imageCompressionQuality );
+            $image->setImageCompressionQuality($this->getModule()->imageCompressionQuality);
 
-                if($size){
-                    if($size['height'] && $size['width']){
-                        $image->cropThumbnailImage($size['width'], $size['height']);
-                    }elseif($size['height']){
-                        $image->thumbnailImage(0, $size['height']);
-                    }elseif($size['width']){
-                        $image->thumbnailImage($size['width'], 0);
-                    }else{
-                        throw new \Exception('Something wrong with this->module->parseSize($sizeString)');
-                    }
+            if ($size) {
+                if ($size['height'] && $size['width']) {
+                    $image->cropThumbnailImage($size['width'], $size['height']);
+                } elseif ($size['height']) {
+                    $image->thumbnailImage(0, $size['height']);
+                } elseif ($size['width']) {
+                    $image->thumbnailImage($size['width'], 0);
+                } else {
+                    throw new \Exception('Something wrong with this->module->parseSize($sizeString)');
                 }
+            }
 
-                $image->writeImage($pathToSave);
-            }else{
-
+            $image->writeImage($pathToSave);
+        } else {
+            if (file_exists($imagePath)) {
                 $image = new SimpleImage($imagePath);
 
-                if($size){
-                    if($size['height'] && $size['width']){
+                if ($size) {
+                    if ($size['height'] && $size['width']) {
 
                         $image->thumbnail($size['width'], $size['height']);
-                    }elseif($size['height']){
+                    } elseif ($size['height']) {
                         $image->fit_to_height($size['height']);
-                    }elseif($size['width']){
+                    } elseif ($size['width']) {
                         $image->fit_to_width($size['width']);
-                    }else{
+                    } else {
                         throw new \Exception('Something wrong with this->module->parseSize($sizeString)');
                     }
                 }
 
                 //WaterMark
-                if($this->getModule()->waterMark){
+                if ($this->getModule()->waterMark) {
 
-                    if(!file_exists(Yii::getAlias($this->getModule()->waterMark))){
+                    if (!file_exists(Yii::getAlias($this->getModule()->waterMark))) {
                         throw new Exception('WaterMark not detected!');
                     }
 
-                    $wmMaxWidth = intval($image->get_width()*0.4);
-                    $wmMaxHeight = intval($image->get_height()*0.4);
+                    $wmMaxWidth = intval($image->get_width() * 0.4);
+                    $wmMaxHeight = intval($image->get_height() * 0.4);
 
                     $waterMarkPath = Yii::getAlias($this->getModule()->waterMark);
 
-                    $waterMark = new \abeautifulsite\SimpleImage($waterMarkPath);
+                    $waterMark = new SimpleImage($waterMarkPath);
 
 
-                    if(
+                    if (
                         $waterMark->get_height() > $wmMaxHeight
                         or
                         $waterMark->get_width() > $wmMaxWidth
-                    ){
+                    ) {
 
-                        $waterMarkPath = $this->getModule()->getCachePath().DIRECTORY_SEPARATOR.
-                            pathinfo($this->getModule()->waterMark)['filename'].
-                            $wmMaxWidth.'x'.$wmMaxHeight.'.'.
+                        $waterMarkPath = $this->getModule()->getCachePath() . DIRECTORY_SEPARATOR .
+                            pathinfo($this->getModule()->waterMark)['filename'] .
+                            $wmMaxWidth . 'x' . $wmMaxHeight . '.' .
                             pathinfo($this->getModule()->waterMark)['extension'];
 
                         //throw new Exception($waterMarkPath);
-                        if(!file_exists($waterMarkPath)){
+                        if (!file_exists($waterMarkPath)) {
                             $waterMark->fit_to_width($wmMaxWidth);
                             $waterMark->save($waterMarkPath, 100);
-                            if(!file_exists($waterMarkPath)){
-                                throw new Exception('Cant save watermark to '.$waterMarkPath.'!!!');
+                            if (!file_exists($waterMarkPath)) {
+                                throw new Exception('Cant save watermark to ' . $waterMarkPath . '!!!');
                             }
                         }
-
                     }
 
                     $image->overlay($waterMarkPath, 'bottom right', .5, -10, -10);
-
                 }
 
-                $image->save($pathToSave, $this->getModule()->imageCompressionQuality );
+                $image->save($pathToSave, $this->getModule()->imageCompressionQuality);
             }
-
-        return $image;
-
-    }
-
-
-    public function setMain($isMain = true){
-        if($isMain){
-            $this->isMain = 1;
-        }else{
-            $this->isMain = 0;
+            else {
+                return null;
+            }
         }
 
+        return $image;
     }
 
 
-    public function getMimeType($size = false) {
-        return image_type_to_mime_type ( exif_imagetype( $this->getPath($size) ) );
+    public function setMain($isMain = true)
+    {
+        if ($isMain) {
+            $this->isMain = 1;
+        } else {
+            $this->isMain = 0;
+        }
     }
 
 
-    protected function getSubDur(){
-        return \yii\helpers\Inflector::pluralize($this->modelName).'/'.$this->modelName.$this->itemId;
+    public function getMimeType($size = false)
+    {
+        return image_type_to_mime_type(exif_imagetype($this->getPath($size)));
+    }
+
+
+    protected function getSubDur()
+    {
+        return \yii\helpers\Inflector::pluralize($this->modelName) . '/' . $this->modelName . $this->itemId;
     }
 
 
