@@ -209,6 +209,9 @@ class ImageBehave extends Behavior
         if(!$img){
             return $this->getModule()->getPlaceHolder();
         }
+        if (!file_exists($img->getPathToOrigin())) {
+            return $this->getModule()->getPlaceHolder();
+        }
 
         return $img;
     }
